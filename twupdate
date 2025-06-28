@@ -1,0 +1,20 @@
+#!/bin/bash
+set -e
+
+echo "[twupdate] Starting system update..."
+
+# 1. Update all zypper packages
+sudo zypper refresh
+sudo zypper --non-interactive dup --allow-vendor-change --replacefiles
+
+# 2. Update system Flatpaks (root install only)
+sudo flatpak update --system -y
+
+# 3. Update user Flatpaks (your user account only)
+flatpak update --user -y       # ← NO sudo here!
+
+# 4. Clean out GPU shader cache
+echo "[twupdate] Cleaning GPU cache..."
+find "$HOME" -type d -name GPUCache -exec rm -rf {} + 2>/dev/null
+
+echo "[twupdate] Update complete. No reboot performed."
